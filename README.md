@@ -20,4 +20,22 @@ scipy~=1.6.2
 
 ## Options
 
-Several Options are available. For some of them a stable internet connection is required.
+No Internet connection is required to run the program.
+
+### Input
+
+```
+-i INPUT [INPUT ...], --input INPUT [INPUT ...]
+```
+
+Use this to import your exported [Megan6](https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/algorithms-in-bioinformatics/software/megan6/) files. Export the required file from Megan6 by opening the KEGG viewer in the main panel. From there, uncollapse the annotation tree (Top-Panel => Tree => Uncollapse All) and select all nodes and leaves (Ctrl/Cmd + a). From the Top-Panel, choose *File* and move the cursor to *Export* and click on *Text (CSV) Format*. Export *eggnogName_to_count* and separator *comma*. The file that is then exported can be used for the analysis.
+
+Multiple files can be added, only separated by a space.
+
+### Output
+
+```
+-o OUTPUT, --output OUTPUT
+```
+
+Choose a valid output Path and name.
