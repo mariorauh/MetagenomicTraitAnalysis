@@ -39,3 +39,13 @@ Multiple files can be added, only separated by a space.
 ```
 
 Choose a valid output Path and name.
+
+### Top N
+
+```
+-t TOP, --top TOP
+```
+
+Optional: Include this flag together with a positive number (Note: neg. numbers will be converted to pos) to choose your own top N annotations to be analyzed in the heatmap. Default is 10.
+
+Note: For a better readability, the maximum depends on how many input files are given and how many high scoring traits they have in common. It is suggested to start with the default value and increase it with every run.
