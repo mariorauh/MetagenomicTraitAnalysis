@@ -5,7 +5,6 @@ import csv, argparse as ap
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 def command_line():
@@ -162,20 +161,6 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
     plt.savefig(f"{out}.kegg.heat.pdf")
     plt.close()
 
-    '''
-    fig, ax = plt.subplots()
-    c = sns.color_palette("coolwarm", as_cmap=True)
-    ax = sns.heatmap(mat, annot=mat, fmt='', cmap=c)
-    ax.set_xticks(np.arange(len(id_set)))
-    ax.set_yticks(np.arange(len(files)))
-    ax.set_xticklabels(id_set)
-    ax.set_yticklabels(files_number)
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-
-    #plt.setp(ax.get_yticklabels(), rotation=90, ha="right", rotation_mode="anchor")
-    plt.tight_layout()
-    plt.savefig(f"{out}.kegg.heat.pdf")
-    '''
 
 def main():
 
