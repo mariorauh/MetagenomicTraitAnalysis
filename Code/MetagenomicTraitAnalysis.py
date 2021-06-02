@@ -5,6 +5,7 @@ import csv, argparse as ap
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def command_line():
@@ -13,6 +14,9 @@ def command_line():
     parser.add_argument("-i", "--input", help="Path to files containing Megan trait count information", type=str,
                         nargs='+')
     parser.add_argument("-o", "--output", help="Output file's name", type=str)
+    parser.add_argument("-t", "--top", help="Include to select top [top] most abundant traits. "
+                                            "We recommend a number between 10 and 40. Default: 10", type=int,
+                        default=10)
 
     return vars(parser.parse_args())
 
@@ -39,7 +43,7 @@ def kegg_conv(megan:str):
         return None
 
 
-def import_all(inp:list):
+def import_all(inp:list, top:int):
     '''
     Import all files to the program and save them in a nested dictionary
     :param inp: input files as list
@@ -62,14 +66,14 @@ def import_all(inp:list):
 
             temp = {} # temp variable to save the last 10 elements in.
 
-            for i in range(1,11):
+            for i in range(1,top+1):
                 key = keys[-i]  # get last elements by negating the i
 
                 temp[key] = megan_values[key]
 
             top_ten[file] = temp    # add dict to final dict
 
-    print(top_ten)
+    #print(top_ten)
     return top_ten
 
 
@@ -92,6 +96,21 @@ def check_multiple_apps(top_ten:dict):
     return final
 
 
+def create_csv(files:list,output:str):
+    '''
+    create a reference csv file in which a number is assigned a file
+    :param files: list of files
+    :param output: output name
+    :return: a csv file containing reference number and associated file name
+    '''
+
+    with open(f'{output}.refs.csv', 'w', newline='') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',')
+        spamwriter.writerow(['ID','Filename'])
+        for i,file in enumerate(files):
+            spamwriter.writerow([i+1,file])
+
+
 def create_heatmap(top_ten:dict, id_set:list, out:str):
     '''
     create a heatmap.
@@ -108,8 +127,8 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
     n = len(id_set)
     m = len(files)
     mat = np.zeros((m,n),int)
-    print(mat)
-    print(id_set)
+    #print(mat)
+    #print(id_set)
     #fill matrix with correct values.
     for i,file in enumerate(files):
         temp = top_ten[file]
@@ -119,7 +138,7 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
                 mat[i][ind] = temp[trait]
 
 
-    print(mat)
+    #print(mat)
 
     short_files = []
     # shorten the file names
@@ -136,9 +155,12 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
             short_files.append(file)
 
     files = short_files
+
+    create_csv(files, out)
+
     files_number = []
     for i in range(len(files)):
-        files_number.append(i)
+        files_number.append(i+1)
 
     # create final heatmap based on above matrix
     fig, ax = plt.subplots()
@@ -147,9 +169,14 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
     ax.set_xticks(np.arange(len(id_set)))
     ax.set_yticks(np.arange(len(files)))
     ax.set_xticklabels(id_set)
-    ax.set_yticklabels(files)
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-    plt.colorbar(im)
+    ax.set_yticklabels(files_number)
+    plt.xticks(rotation=90)
+    #plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    # added divider for colorbar. Adapted from stackoverflow.com
+    divider = make_axes_locatable(ax)
+    cax = divider.new_vertical(size="20%", pad=1, pack_start=True)
+    fig.add_axes(cax)
+    fig.colorbar(im, cax=cax, orientation="horizontal")
     '''
     # create cell labels
     for i in range(len(files)):
@@ -158,19 +185,22 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
     '''
     ax.set_title("Heatmap Megan Annotations")
     fig.tight_layout()
-    plt.savefig(f"{out}.kegg.heat.pdf")
+    plt.savefig(f"{out}.kegg.heat.png", dpi=1024)
     plt.close()
 
 
-def main():
-
+def exec():
     print("Metagenomic Data Analysis")
     args = command_line()
-    inp, out = args["input"], args["output"]
+    inp, out, top = args["input"], args["output"], abs(args["top"])
 
-    top_ten = import_all(inp)
+    top_ten = import_all(inp, top)
     id_set = check_multiple_apps(top_ten)
     create_heatmap(top_ten, id_set,out)
+
+def main():
+
+    exec()
 
 
 if __name__ == '__main__':
