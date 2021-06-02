@@ -110,13 +110,15 @@ def create_heatmap(top_ten:dict, id_set:list, out:str):
     m = len(files)
     mat = np.zeros((m,n),int)
     print(mat)
-
+    print(id_set)
     #fill matrix with correct values.
     for i,file in enumerate(files):
         temp = top_ten[file]
-        for j,trait in enumerate(temp.keys()):
+        for trait in temp.keys():
             if trait in id_set:
-                mat[i][j] = temp[trait]
+                ind = id_set.index(trait)
+                mat[i][ind] = temp[trait]
+
 
     print(mat)
 
